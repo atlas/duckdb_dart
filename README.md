@@ -215,6 +215,27 @@ Explore more examples in the [examples directory](https://github.com/TheAtlasRep
 
 ---
 
+## Which DuckDB does this ship?
+
+The root `DUCKDB_VERSION` file. It is the tag the Android and iOS Makefiles clone
+from DuckDB and the version the release workflow builds; the `duckdb_version`
+workflow input overrides it for a one-off build.
+
+This package's own version is independent and does not track DuckDB's — read
+`DUCKDB_VERSION`, not the package version, to find out what the native binaries
+are built from.
+
+Upstream DuckDB has no iOS framework target, so `ios/CMakeLists.txt` adds one.
+It `add_subdirectory()`s the pinned upstream checkout unmodified and defines
+`duckdb_framework` alongside it, so bumping `DUCKDB_VERSION` needs no changes to
+DuckDB's own build files.
+
+Two traps if you edit that file. `duckdb.h` must stay in the target's source
+list — CMake only copies `PUBLIC_HEADER` into the framework's `Headers/` when
+the header is also a source, and the build asserts this. And the extensions must
+be linked explicitly, because `duckdb_static` does not carry them; drop them and
+the framework silently loses `read_parquet` and JSON.
+
 ## Platform Support
 
 DuckDB.dart supports the following platforms:

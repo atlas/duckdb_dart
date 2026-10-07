@@ -97,3 +97,8 @@ examples/simple/linux/flutter/ephemeral/.plugin_symlinks/
 
 # FVM Version Cache
 .fvm/
+
+# iOS build trees
+ios/build/
+ios/duckdb/
+ios/Libraries/

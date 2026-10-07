@@ -7,12 +7,8 @@ on:
   workflow_dispatch:
     inputs:
       duckdb_version:
-        description: 'DuckDB version to build (e.g., v1.4.2)'
+        description: 'DuckDB version to build (e.g., v1.5.5). Defaults to the DUCKDB_VERSION file.'
         required: false
-        default: 'v1.4.4'
-
-env:
-  DUCKDB_VERSION: ${{ github.event.inputs.duckdb_version || 'v1.4.4' }}
 
 jobs:
   build-ios:
@@ -21,6 +17,13 @@ jobs:
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+
+      - name: Resolve DuckDB version
+        run: |
+          version="${{ github.event.inputs.duckdb_version }}"
+          [ -n "$version" ] || version="$(cat DUCKDB_VERSION)"
+          echo "DUCKDB_VERSION=$version" >> "$GITHUB_ENV"
+          echo "Building DuckDB $version"
 
       - name: Install dependencies
         run: |
@@ -34,12 +37,12 @@ jobs:
       - name: Build iOS Device Framework
         working-directory: ios
         run: |
-          make -f Makefile.internal device
+          make -f Makefile.internal VERSION="$DUCKDB_VERSION" device
 
       - name: Build iOS Simulator Framework
         working-directory: ios
         run: |
-          make -f Makefile.internal simulator_no_clone
+          make -f Makefile.internal VERSION="$DUCKDB_VERSION" simulator
 
       - name: Create XCFramework
         working-directory: ios
@@ -100,6 +103,13 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v4
 
+      - name: Resolve DuckDB version
+        run: |
+          version="${{ github.event.inputs.duckdb_version }}"
+          [ -n "$version" ] || version="$(cat DUCKDB_VERSION)"
+          echo "DUCKDB_VERSION=$version" >> "$GITHUB_ENV"
+          echo "Building DuckDB $version"
+
       - name: Install dependencies
         run: |
           sudo apt-get update
@@ -120,7 +130,7 @@ jobs:
       - name: Build Android ${{ matrix.abi }}
         working-directory: android
         run: |
-          make -f Makefile.internal build_${{ matrix.abi }}
+          make -f Makefile.internal VERSION="$DUCKDB_VERSION" build_${{ matrix.abi }}
 
       - name: Package Android Library
         working-directory: android

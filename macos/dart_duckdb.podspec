@@ -5,6 +5,7 @@
 Pod::Spec.new do |s|
   s.name             = 'dart_duckdb'
   s.version          = File.read(File.join('..', 'pubspec.yaml')).match(/version:\s+(\d+\.\d+\.\d+)/)[1]
+  duckdb_version     = File.read(File.join('..', 'DUCKDB_VERSION')).strip
   s.summary          = 'A new flutter plugin project.'
   s.description      = <<-DESC
     A new flutter plugin project.
@@ -27,7 +28,7 @@ Pod::Spec.new do |s|
     mkdir -p Libraries/release  # Ensure the directory exists
     if [ ! -f "Libraries/release/libduckdb.dylib" ]; then
       echo "Downloading DuckDB library..."
-      curl -L -o libduckdb-osx-universal.zip "https://github.com/duckdb/duckdb/releases/download/v1.4.2/libduckdb-osx-universal.zip"
+      curl -L -o libduckdb-osx-universal.zip "https://github.com/duckdb/duckdb/releases/download/#{duckdb_version}/libduckdb-osx-universal.zip"
       unzip -o libduckdb-osx-universal.zip -d Libraries/release/
       rm libduckdb-osx-universal.zip
     else
